@@ -1,22 +1,10 @@
-import { StyleSheet, Text, View, KeyboardAvoidingView, Image, TouchableOpacity } from 'react-native';
-import React, { useRef, useState } from 'react';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { StyleSheet, Text, View, KeyboardAvoidingView, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import React from 'react';
 import dataCollapsible from '../data/dataCollapsible';
-import { Transition, Transitioning } from 'react-native-reanimated';
 import { auth } from '../firebase';
-
-const transition = (
-  <Transition.Together>
-    <Transition.in type='fade' durationMs={200} />
-    <Transition.Change />
-    <Transition.Out type='fade' durationMs={200} />
-  </Transition.Together>
-);
-
+import AcordeonItem from './AcordeonItem';
 
 const HomeScreen = ({ navigation }) => {
-  const [currentIndex, setCurrentIndex] = useState(null);
-  const ref = useRef()
 
   const handleSignOut = () => {
     auth.signOut().then(() => navigation.replace("Login")).catch((error) => {
@@ -25,13 +13,11 @@ const HomeScreen = ({ navigation }) => {
     })
   }
 
-
   return (
+    <ScrollView >
     <View
-      ref={ref}
       style={styles.container}
       behavior="padding"
-      keyboardVerticalOffset={60}
     >
       <View style={styles.headerOptions} >
         <View style={styles.titleContainer} >
@@ -99,34 +85,18 @@ const HomeScreen = ({ navigation }) => {
 
       <View
         style={styles.expansibleContainer}>
-        {dataCollapsible.map(({ title, content }, index) => {
-          return (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              key={title}
-              onPress={() => {
-                setCurrentIndex(index === currentIndex ? null : index)
-              }}
-              style={[styles.cardExpansibleContainer, { backgroundColor: index === currentIndex ? '#9FCBF6' : '#F5F5F5' }]}>
-              <View style={styles.card} >
-                <Text style={styles.textCard}>{title}</Text>
-                {
-                  index === currentIndex ? <Icon name="keyboard-arrow-up" style={styles.iconInput} /> :
-                    <Icon name="keyboard-arrow-down" style={styles.iconInput} />
-                }
-              </View>
-              {
-                index === currentIndex && <View style={styles.contentContainer} >
-                  <Text style={styles.contentText} >{content}</Text>
-                </View>
-              }
-            </TouchableOpacity>
-          )
-        })}
+        <FlatList
+          data={dataCollapsible}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <AcordeonItem id={item.id} title={item.title} bodyText={item.content} />
+          )}
 
+        />
       </View>
 
     </View>
+    </ScrollView>
   )
 }
 
