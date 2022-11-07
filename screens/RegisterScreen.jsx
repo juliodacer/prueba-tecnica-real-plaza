@@ -32,7 +32,7 @@ const RegisterScreen = ({ navigation }) => {
       createUserWithEmailAndPassword(auth, values.email, values.password)
         .then((userCredential) => {
           sendEmailVerification(auth.currentUser);
-          navigation.navigate("Home", { user: userCredential.user });
+          navigation.navigate("Login", { user: userCredential.user });
         })
         .catch((error) => {
           //setValidationMessage(error.message);
@@ -158,13 +158,21 @@ const styles = StyleSheet.create({
     flex: 1,
     width: 'auto',
     justifyContent: 'center',
-    marginHorizontal: 25,
-    backgroundColor: '#F5F5F5'
-  },
+    backgroundColor: 'rgba(0, 0, 0, 0.24)'
+    },
   inputContainer: {
     marginHorizontal: 5,
     backgroundColor: '#FFFFFF',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginHorizontal: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.36,
+    shadowRadius: 6.68,
+    elevation: 11
   },
   titleContainer: {
     height: 64,
@@ -198,7 +206,7 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   iconInput: {
-    color: "#000",
+    color: 'rgba(0, 0, 0, 0.5)',
     fontSize: 25,
     marginLeft: 5
   },

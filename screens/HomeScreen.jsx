@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import dataCollapsible from '../data/dataCollapsible';
 import { Transition, Transitioning } from 'react-native-reanimated';
+import { auth } from '../firebase';
 
 const transition = (
   <Transition.Together>
@@ -12,9 +13,18 @@ const transition = (
   </Transition.Together>
 );
 
-const HomeScreen = () => {
+
+const HomeScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(null);
   const ref = useRef()
+
+  const handleSignOut = () => {
+    auth.signOut().then(() => navigation.replace("Login")).catch((error) => {
+      //setValidationMessage(error.message);
+      console.log(error.message)
+    })
+  }
+
 
   return (
     <View
@@ -28,6 +38,13 @@ const HomeScreen = () => {
           <Text style={styles.title}>
             Opciones
           </Text>
+
+          <TouchableOpacity onPress={() => handleSignOut()}>
+            <Text style={[styles.title, { padding: 10, backgroundColor: '#589BDE', borderRadius: 10, color: '#fff' }]}>
+              Cerrar Sesión
+            </Text>
+          </TouchableOpacity>
+
         </View>
 
         <View style={styles.containerIcons}>
@@ -85,11 +102,12 @@ const HomeScreen = () => {
         {dataCollapsible.map(({ title, content }, index) => {
           return (
             <TouchableOpacity
+              activeOpacity={0.8}
               key={title}
               onPress={() => {
                 setCurrentIndex(index === currentIndex ? null : index)
               }}
-              style={styles.cardExpansibleContainer}>
+              style={[styles.cardExpansibleContainer, { backgroundColor: index === currentIndex ? '#9FCBF6' : '#F5F5F5' }]}>
               <View style={styles.card} >
                 <Text style={styles.textCard}>{title}</Text>
                 {
@@ -123,8 +141,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 25,
   },
   titleContainer: {
-    marginTop: 40,
-    alignItems: 'flex-start'
+    marginTop: 45,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   containerIcons: {
     flexDirection: 'row',
@@ -147,7 +167,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 2
+    padding: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
+    shadowOpacity: 0.36,
+    shadowRadius: 6.68,
+    elevation: 11
   },
   image: {
     width: '90%',
@@ -160,7 +188,7 @@ const styles = StyleSheet.create({
   },
   cardExpansibleContainer: {
     padding: 20,
-    backgroundColor: '#F5F5F5',
+    //backgroundColor: '#F5F5F5',
     marginBottom: 10,
     justifyContent: 'center',
   },

@@ -49,7 +49,10 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.title}>INICIAR SESIÓN</Text>
                 </View>
 
-                <Text style={styles.textValidationMessage}>{errorMessage}</Text>
+                { errorMessage && (
+                    <Text style={styles.textValidationMessage}>{errorMessage}</Text>
+                )}
+
 
                 <View style={styles.inputTextContainerGroup}>
                     <View style={styles.inputTextContainer} >
@@ -73,7 +76,7 @@ const LoginScreen = ({ navigation }) => {
                         <TextInput
                             placeholder='Contraseña'
                             style={styles.input}
-                            value={password} 
+                            value={password}
                             onChangeText={setPassword}
                             autoCapitalize="none"
                             autoCorrect={false}
@@ -83,7 +86,7 @@ const LoginScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={() => onPress = { login }}
+                    <TouchableOpacity onPress={() => login() }
                         style={styles.button}
                     >
                         <Text style={styles.textButton}>INGRESAR</Text>
@@ -116,7 +119,15 @@ const styles = StyleSheet.create({
     inputContainer: {
         marginHorizontal: 5,
         backgroundColor: '#FFFFFF',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 5
+        },
+        shadowOpacity: 0.36,
+        shadowRadius: 6.68,
+        elevation: 11
     },
     titleContainer: {
         height: 64,
@@ -149,7 +160,7 @@ const styles = StyleSheet.create({
         marginLeft: 10
     },
     iconInput: {
-        color: "#000",
+        color: 'rgba(0, 0, 0, 0.5)',
         fontSize: 25,
         marginLeft: 5
     },
