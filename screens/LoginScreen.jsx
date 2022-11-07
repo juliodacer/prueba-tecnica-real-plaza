@@ -1,12 +1,47 @@
-import React from 'react'
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform } from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
+
+    if (auth.currentUser) {
+        navigation.navigate("Home");
+    } else {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                navigation.navigate("Home");
+            }
+        });
+    }
+
+    const [errorMessage, setErrorMessage] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
+
+    const login = () => {
+        if (email !== "" && password !== "") {
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    navigation.navigate("Home", { user: userCredential.user });
+                    setErrorMessage("");
+                    setEmail("");
+                    setPassword("");
+                })
+                .catch((error) => {
+                    setErrorMessage(error.message)
+                });
+        } else {
+            setErrorMessage("Por favor, ingrese un correo y una constraseña");
+        }
+    }
+
     return (
         <KeyboardAvoidingView
             style={styles.container}
-            behavior="padding"
+            behavior={Platform.OS === "ios" ? "padding" : null}
+            keyboardVerticalOffset={60}
         >
             <View style={styles.inputContainer} >
 
@@ -14,15 +49,20 @@ const LoginScreen = () => {
                     <Text style={styles.title}>INICIAR SESIÓN</Text>
                 </View>
 
+                <Text style={styles.textValidationMessage}>{errorMessage}</Text>
+
                 <View style={styles.inputTextContainerGroup}>
                     <View style={styles.inputTextContainer} >
 
-                        <Icon name="user" style={styles.iconInput} />
+                        <Icon name="person" style={styles.iconInput} />
 
                         <TextInput
                             placeholder='Usuario'
                             style={styles.input}
-
+                            value={email}
+                            onChangeText={setEmail}
+                            autoCapitalize="none"
+                            autoCorrect={false}
                         />
                     </View>
 
@@ -33,13 +73,17 @@ const LoginScreen = () => {
                         <TextInput
                             placeholder='Contraseña'
                             style={styles.input}
+                            value={password} 
+                            onChangeText={setPassword}
+                            autoCapitalize="none"
+                            autoCorrect={false}
                             secureTextEntry
                         />
                     </View>
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={() => { }}
+                    <TouchableOpacity onPress={() => onPress = { login }}
                         style={styles.button}
                     >
                         <Text style={styles.textButton}>INGRESAR</Text>
@@ -47,7 +91,7 @@ const LoginScreen = () => {
                 </View>
 
                 <View style={styles.goToContainer}>
-                    <TouchableOpacity onPress={() => { }}
+                    <TouchableOpacity onPress={() => navigation.navigate('Register')}
                     >
                         <Text style={styles.textGoTo}>Registrarme</Text>
                     </TouchableOpacity>
@@ -59,7 +103,7 @@ const LoginScreen = () => {
     )
 }
 
-export default LoginScreen
+export default LoginScreen;
 
 const styles = StyleSheet.create({
     container: {
@@ -96,6 +140,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 10
+    },
+    textValidationMessage: {
+        color: 'red',
+        alignSelf: 'center'
     },
     input: {
         marginLeft: 10
