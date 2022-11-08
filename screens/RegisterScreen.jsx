@@ -1,13 +1,18 @@
 import React from 'react'
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Platform } from 'react-native'
+import { KeyboardAvoidingView, Text, TextInput, View, Platform } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from '../firebase';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import * as Yup from 'yup'
-
+import HeaderForm from '../components/HeaderForm';
+import { stylesForm } from '../assets/constants/Styles';
+import Buttons from '../components/Buttons';
+import Footer from '../components/Footer';
 
 const RegisterScreen = ({ navigation }) => {
+
+  const [errorMessage, setErrorMessage] = React.useState("");
 
   const SignUpSchema = Yup.object().shape({
     email: Yup.string()
@@ -24,7 +29,7 @@ const RegisterScreen = ({ navigation }) => {
       .min(8, 'Mínimo 8 caracteres')
       .oneOf([Yup.ref('password')], 'Su contraseña no coincide')
       .required('Por favor confirme su contraseña')
-    
+
   })
 
   let signUp = (values) => {
@@ -35,7 +40,7 @@ const RegisterScreen = ({ navigation }) => {
           navigation.navigate("Login", { user: userCredential.user });
         })
         .catch((error) => {
-          //setValidationMessage(error.message);
+          setErrorMessage(error.message);
           console.log(error.message);
         });
     }
@@ -49,33 +54,35 @@ const RegisterScreen = ({ navigation }) => {
         confirmPassword: ''
       }}
       validationSchema={SignUpSchema}
-      onSubmit={values => {signUp(values)}}
+      onSubmit={values => { signUp(values) }}
     >
 
       {({ values, errors, touched, handleChange, setFieldTouched, isValid, handleSubmit }) => (
 
-
-
         <KeyboardAvoidingView
-          style={styles.container}
+          style={stylesForm.containerForm}
           behavior={Platform.OS === "ios" ? "padding" : null}
           keyboardVerticalOffset={60}
         >
-          <View style={styles.inputContainer} >
+          <View style={stylesForm.inputContainerForm} >
 
-            <View style={styles.titleContainer} >
-              <Text style={styles.title}>REGISTRARME</Text>
-            </View>
+            <HeaderForm title={"REGISTRARME"} />
 
-            <View style={styles.inputTextContainerGroup}>
-              <View style={styles.inputTextContainer} >
+            {errorMessage && (
+                    <View style={stylesForm.containerError}>
+                        <Text style={stylesForm.textValidationMessage}>{errorMessage}</Text>
+                    </View>
+                )}
 
-                <Icon name="person" style={styles.iconInput} />
+            <View style={stylesForm.inputTextContainerGroup}>
+              <View style={stylesForm.inputTextContainer} >
+
+                <Icon name="person" style={stylesForm.iconInput} />
 
                 <TextInput
                   autoCapitalize={false}
                   placeholder='Usuario'
-                  style={styles.input}
+                  style={stylesForm.input}
                   value={values.email}
                   onChangeText={handleChange('email')}
                   onBlur={() => setFieldTouched('email')}
@@ -84,17 +91,17 @@ const RegisterScreen = ({ navigation }) => {
               </View>
 
               {touched.email && errors.email && (
-                <Text style={styles.textValidationMessage}>{errors.email}</Text>
+                <Text style={[stylesForm.textValidationMessage, {alignSelf: 'flex-start'}]}>{errors.email}</Text>
               )}
 
-              <View style={styles.inputTextContainer} >
+              <View style={stylesForm.inputTextContainer} >
 
-                <Icon name="lock" style={styles.iconInput} />
+                <Icon name="lock" style={stylesForm.iconInput} />
 
                 <TextInput
                   placeholder='Contraseña'
                   autoCapitalize={false}
-                  style={styles.input}
+                  style={stylesForm.input}
                   value={values.password}
                   onChangeText={handleChange('password')}
                   secureTextEntry
@@ -103,16 +110,16 @@ const RegisterScreen = ({ navigation }) => {
               </View>
 
               {touched.password && errors.password && (
-                <Text style={styles.textValidationMessage}>{errors.password}</Text>
+                <Text style={[stylesForm.textValidationMessage, {alignSelf: 'flex-start'}]}>{errors.password}</Text>
               )}
 
-              <View style={styles.inputTextContainer} >
+              <View style={stylesForm.inputTextContainer} >
 
-                <Icon name="lock" style={styles.iconInput} />
+                <Icon name="lock" style={stylesForm.iconInput} />
 
                 <TextInput
                   placeholder='Confirmar Contraseña'
-                  style={styles.input}
+                  style={stylesForm.input}
                   autoCapitalize={false}
                   secureTextEntry
                   value={values.confirmPassword}
@@ -121,27 +128,12 @@ const RegisterScreen = ({ navigation }) => {
                 />
               </View>
               {touched.confirmPassword && errors.confirmPassword && (
-                <Text style={styles.textValidationMessage}>{errors.confirmPassword}</Text>
+                <Text style={[stylesForm.textValidationMessage, {alignSelf: 'flex-start'}]}>{errors.confirmPassword}</Text>
               )}
             </View>
 
-
-            <View style={[styles.buttonContainer, { backgroundColor: isValid ? '#5CB85C' : '#A5C9CA' }]}>
-              <TouchableOpacity 
-                onPress={handleSubmit}
-                disabled={!isValid}
-                style={styles.button}
-              >
-                <Text style={styles.textButton}>REGISTRAR</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.goToContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}
-              >
-                <Text style={styles.textGoTo}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
+            <Buttons onPress={handleSubmit} text={"REGISTRAR"} disabled={!isValid} style={{ backgroundColor: isValid ? '#5CB85C' : '#A5C9CA' }} />
+            <Footer onPress={() => navigation.navigate('Login')} text={"Cancelar"} />
 
           </View>
 
@@ -152,90 +144,3 @@ const RegisterScreen = ({ navigation }) => {
 }
 
 export default RegisterScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: 'auto',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.24)'
-    },
-  inputContainer: {
-    marginHorizontal: 5,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'space-between',
-    marginHorizontal: 25,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5
-    },
-    shadowOpacity: 0.36,
-    shadowRadius: 6.68,
-    elevation: 11
-  },
-  titleContainer: {
-    height: 64,
-    backgroundColor: '#29367C',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  title: {
-    fontSize: 24,
-    color: '#ffffff',
-    fontWeight: '700'
-  },
-
-  textValidationMessage: {
-    color: 'red',
-    alignSelf: 'flex-start'
-  },
-  inputTextContainerGroup: {
-    marginHorizontal: 30,
-    marginVertical: 10
-  },
-  inputTextContainer: {
-    borderColor: '#00000',
-    borderBottomWidth: 1,
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10
-  },
-  input: {
-    marginLeft: 10
-  },
-  iconInput: {
-    color: 'rgba(0, 0, 0, 0.5)',
-    fontSize: 25,
-    marginLeft: 5
-  },
-
-  buttonContainer: {
-    //backgroundColor: '#5CB85C',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginTop: 20,
-    marginBottom: 20
-  },
-  textButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#ffffff'
-  },
-  goToContainer: {
-    backgroundColor: '#fafafa',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 15
-  },
-  textGoTo: {
-    color: '#1469BE',
-    borderColor: '#1469BE',
-    borderBottomWidth: 1,
-    fontWeight: '700',
-  }
-})
