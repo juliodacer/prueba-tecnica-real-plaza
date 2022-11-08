@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
 
           </View>
 
-          <View style={styles.containerIcons}>
+          <View style={stylesHome.containerIcons}>
 
             <OptionHome source={require('../assets/img/cart.png')} text={"Carrito"} style={{ borderRadius: 50 }} />
 
@@ -45,7 +45,7 @@ const HomeScreen = ({ navigation }) => {
 
           </View>
 
-          <View style={styles.containerIcons}>
+          <View style={stylesHome.containerIcons}>
 
             <OptionHome source={require('../assets/img/globito.png')}text={"Aniversario"}/>
 
@@ -58,7 +58,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <View
-          style={styles.expansibleContainer}>
+          style={stylesHome.expansibleContainer}>
           <FlatList
             data={dataCollapsible}
             keyExtractor={(item) => item.id.toString()}
